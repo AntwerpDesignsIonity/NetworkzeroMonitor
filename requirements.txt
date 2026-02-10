@@ -1,0 +1,12 @@
+# NetworkzeroMonitor Dependencies
+# Core networking libraries
+ping3>=4.0.4
+dnspython>=2.4.2
+psutil>=5.9.6
+requests>=2.31.0
+
+# GUI framework
+tkinter-tooltip>=2.1.0
+
+# Data visualization
+matplotlib>=3.8.2
