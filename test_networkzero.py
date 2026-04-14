@@ -96,7 +96,7 @@ class TestNetworkMonitorDNS(unittest.TestCase):
     @patch('network_monitor.DNS_AVAILABLE', False)
     def test_dns_fallback_socket(self):
         monitor = NetworkMonitor()
-        result = monitor._dns_via_socket('localhost')
+        result = monitor.check_dns_resolution('localhost')
         self.assertIn('success', result)
 
 

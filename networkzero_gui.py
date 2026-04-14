@@ -636,7 +636,7 @@ class NetworkzeroGUI:
 
 def main():
     root = tk.Tk()
-    app = NetworkzeroGUI(root)  # noqa: F841
+    NetworkzeroGUI(root)
     root.mainloop()
 
 

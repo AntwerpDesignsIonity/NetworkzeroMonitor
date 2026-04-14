@@ -362,12 +362,20 @@ class PiHoleMonitor:
         self.pihole_url = pihole_url.rstrip('/')
         self.api_key = api_key
 
+    @staticmethod
+    def _sanitize_error(exc: Exception) -> str:
+        """Return an error string with any auth token value redacted."""
+        import re
+        return re.sub(r'(auth=)[^&\s\'"]+', r'\1[REDACTED]', str(exc))
+
     def _api_get(self, params: str) -> Dict:
         """Helper to call the Pi-hole admin API."""
-        url = f"{self.pihole_url}/admin/api.php?{params}"
+        base_url = f"{self.pihole_url}/admin/api.php?{params}"
         if self.api_key:
-            url += f"&auth={self.api_key}"
-        response = requests.get(url, timeout=5)
+            base_url += "&auth="
+        # Build final URL separately so the key value isn't in exception context
+        request_url = (base_url + self.api_key) if self.api_key else base_url
+        response = requests.get(request_url, timeout=5)
         response.raise_for_status()
         return response.json()
 
@@ -392,7 +400,7 @@ class PiHoleMonitor:
         except Exception as exc:
             return {
                 'success': False,
-                'error': str(exc),
+                'error': self._sanitize_error(exc),
                 'timestamp': time.strftime('%Y-%m-%d %H:%M:%S'),
             }
 
@@ -417,7 +425,7 @@ class PiHoleMonitor:
         except Exception as exc:
             return {
                 'success': False,
-                'error': str(exc),
+                'error': self._sanitize_error(exc),
                 'timestamp': time.strftime('%Y-%m-%d %H:%M:%S'),
             }
 
@@ -439,12 +447,9 @@ class PiHoleMonitor:
         except Exception as exc:
             return {
                 'success': False,
-                'error': str(exc),
+                'error': self._sanitize_error(exc),
                 'timestamp': time.strftime('%Y-%m-%d %H:%M:%S'),
             }
-
-
-if __name__ == '__main__':
     monitor = NetworkMonitor()
     print("NetworkzeroMonitor - Core Module Test")
     print("Ionity (Pty) Ltd - www.ionity.today")
