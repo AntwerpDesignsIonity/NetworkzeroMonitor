@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1020" />
+  <meta name="description" content="NetworkzeroMonitor mobile - full-stack network monitoring from interfaces to GNSS and satellite. Ionity (Pty) Ltd." />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="NetworkzeroMonitor" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/svg+xml" href="icon.svg" />
+  <link rel="apple-touch-icon" href="icon.svg" />
+  <link rel="stylesheet" href="styles.css" />
+  <title>NetworkzeroMonitor</title>
+</head>
+<body>
+  <header class="app-bar">
+    <div class="brand">
+      <img src="icon.svg" alt="" class="brand-logo" />
+      <div>
+        <h1>NetworkzeroMonitor</h1>
+        <span class="sub">Ionity (Pty) Ltd · www.ionity.today</span>
+      </div>
+    </div>
+    <button id="refresh" class="icon-btn" title="Refresh" aria-label="Refresh">⟳</button>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-view="dashboard">Dashboard</button>
+    <button class="tab" data-view="layers">Layers</button>
+    <button class="tab" data-view="gnss">GNSS</button>
+    <button class="tab" data-view="tools">Tools</button>
+  </nav>
+
+  <main id="content">
+    <!-- Dashboard -->
+    <section class="view active" id="view-dashboard">
+      <div class="status-banner" id="status-banner">
+        <span class="dot" id="status-dot"></span>
+        <span id="status-text">Connecting…</span>
+      </div>
+      <div class="grid" id="dashboard-grid"></div>
+    </section>
+
+    <!-- Network layers -->
+    <section class="view" id="view-layers">
+      <div class="grid" id="layers-grid"></div>
+    </section>
+
+    <!-- GNSS / satellites -->
+    <section class="view" id="view-gnss">
+      <div id="gnss-panel"></div>
+    </section>
+
+    <!-- Tools (ping / dns / ports) -->
+    <section class="view" id="view-tools">
+      <div class="card">
+        <h2>Ping</h2>
+        <div class="field-row">
+          <input id="ping-host" type="text" placeholder="host e.g. 8.8.8.8" value="8.8.8.8" />
+          <button class="btn" data-tool="ping">Run</button>
+        </div>
+        <pre class="output" id="ping-out"></pre>
+      </div>
+      <div class="card">
+        <h2>DNS Lookup</h2>
+        <div class="field-row">
+          <input id="dns-domain" type="text" placeholder="domain e.g. github.com" value="github.com" />
+          <input id="dns-server" type="text" placeholder="server (optional)" />
+          <button class="btn" data-tool="dns">Run</button>
+        </div>
+        <pre class="output" id="dns-out"></pre>
+      </div>
+      <div class="card">
+        <h2>Port Scan</h2>
+        <div class="field-row">
+          <input id="ports-host" type="text" placeholder="host" value="127.0.0.1" />
+          <input id="ports-list" type="text" placeholder="ports e.g. 22,80,443" />
+          <button class="btn" data-tool="ports">Run</button>
+        </div>
+        <pre class="output" id="ports-out"></pre>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-foot">
+    <span id="foot-meta">NetworkzeroMonitor</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

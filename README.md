@@ -2,8 +2,11 @@
 
 > **Ionity (Pty) Ltd** — [www.ionity.today](https://www.ionity.today)
 
-A cross-platform, Python-based network monitoring tool with a full **GUI** and a rich **CLI**.
-Monitor pings, DNS, active ports, interface traffic and Pi-hole statistics — all from one place.
+A cross-platform, Python-based network monitoring tool with a full **GUI**, a rich **CLI**,
+and an installable **mobile app (PWA)**. Monitor pings, DNS, active ports, interface traffic
+and Pi-hole statistics — plus the *full network stack* from physical interfaces all the way up
+to **cellular (2G–5G)**, **Wi-Fi**, **satellite internet (Starlink)** and **GNSS / satellite
+positioning** — all from one place, including from your phone.
 
 ---
 
@@ -20,6 +23,25 @@ Monitor pings, DNS, active ports, interface traffic and Pi-hole statistics — a
 | Interface traffic counters | ✓ | ✓ |
 | Pi-hole status / summary / top blocked | ✓ | ✓ |
 | Live continuous monitoring | ✓ | ✓ |
+
+### 📱 Mobile app — extended network stack
+
+A separate **mobile PWA** (served by the built-in API server) adds full-stack
+visibility you can open on any phone:
+
+| Layer | Source | Notes |
+|---|---|---|
+| Host / interfaces / IP / traffic | psutil | Same data as desktop |
+| Internet connectivity & quality | ping | Live dashboard |
+| **Cellular (2G/3G/4G/5G)** | ModemManager (`mmcli`) | Operator, generation, signal |
+| **Wi-Fi link** | `nmcli` / `iw` | SSID, signal, band, rate |
+| **Satellite internet (Starlink)** | Dish gRPC @ `192.168.100.1` | Latency, throughput, obstruction |
+| **GNSS / satellite positioning** | `gpsd` | Fix, lat/lon, satellites in view (GPS/Galileo/GLONASS/BeiDou) |
+| Ping / DNS / port tools | core engine | Interactive, on-device |
+
+Each extended layer degrades gracefully: when the hardware or helper tool
+isn't present, the app shows a clear "unavailable" state with the reason
+instead of failing.
 
 ---
 
@@ -64,6 +86,49 @@ run_gui.bat           # Windows
 ./run_cli.sh --help   # Unix
 run_cli.bat --help    # Windows
 ```
+
+**📱 Mobile app (PWA):**
+```bash
+./run_mobile.sh       # Unix
+run_mobile.bat        # Windows
+```
+Then, on your phone (connected to the same network), open the printed URL
+(e.g. `http://192.168.1.50:8088`) in your browser and choose **"Add to Home
+Screen"** to install it as an app. The server binds to `0.0.0.0:8088` by
+default; override with `NZM_HOST` / `NZM_PORT` or the `[Mobile]` section of
+`config.ini`.
+
+---
+
+## 📡 Mobile REST API
+
+The mobile app is backed by a small Flask API (`api_server.py`). The same
+endpoints can be consumed by any client:
+
+| Endpoint | Description |
+|---|---|
+| `GET /api/overview` | Everything for the dashboard in one call |
+| `GET /api/network` | Hostname, IPs, interfaces |
+| `GET /api/connectivity` | Internet reachability & quality |
+| `GET /api/traffic` | Per-interface traffic counters |
+| `GET /api/ping?host=&count=` | Ping a host |
+| `GET /api/dns?domain=&server=` | DNS lookup |
+| `GET /api/ports?host=&ports=` | Port scan |
+| `GET /api/pihole/<action>` | Pi-hole status / summary / blocked |
+| `GET /api/extended/cellular` | Mobile broadband (2G–5G) |
+| `GET /api/extended/wifi` | Wi-Fi link details |
+| `GET /api/extended/satellite` | Satellite internet (Starlink) |
+| `GET /api/extended/gnss` | GNSS / satellite positioning |
+| `GET /api/extended/all` | Consolidated multi-layer snapshot |
+
+### Optional helper tools (for full extended data)
+
+These are auto-detected; install only the layers you need:
+
+- **Cellular:** `ModemManager` (provides `mmcli`)
+- **Wi-Fi:** `network-manager` (provides `nmcli`)
+- **Satellite internet:** `grpcurl` (for live Starlink telemetry)
+- **GNSS:** `gpsd` + a connected GNSS/GPS receiver
 
 ---
 
@@ -181,15 +246,24 @@ python test_networkzero.py --demo
 ```
 NetworkzeroMonitor/
 ├── network_monitor.py      # Core monitoring engine
+├── network_extended.py     # Extended layers: cellular, wifi, satellite, GNSS
 ├── networkzero_cli.py      # Command-line interface
 ├── networkzero_gui.py      # Graphical user interface (tkinter)
+├── api_server.py           # Mobile REST API + PWA server (Flask)
+├── mobile/                 # Installable mobile PWA front-end
+│   ├── index.html
+│   ├── styles.css
+│   ├── app.js
+│   ├── manifest.webmanifest
+│   ├── service-worker.js
+│   └── icon.svg
 ├── test_networkzero.py     # Unit + integration tests
 ├── config.ini              # Application configuration
 ├── requirements.txt        # Python dependencies
-├── setup.sh                # Unix setup script
-├── setup.bat               # Windows setup script
+├── setup.sh / setup.bat    # Setup scripts
 ├── run_cli.sh / run_cli.bat
-└── run_gui.sh / run_gui.bat
+├── run_gui.sh / run_gui.bat
+└── run_mobile.sh / run_mobile.bat
 ```
 
 ---

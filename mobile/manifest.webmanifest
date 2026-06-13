@@ -1,0 +1,19 @@
+{
+  "name": "NetworkzeroMonitor",
+  "short_name": "NetzeroMon",
+  "description": "Full-stack network monitoring from interfaces to GNSS and satellite. Ionity (Pty) Ltd.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b1020",
+  "theme_color": "#0b1020",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
