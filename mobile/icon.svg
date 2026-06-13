@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192" role="img" aria-label="NetworkzeroMonitor">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#142447"/>
+      <stop offset="1" stop-color="#0b1020"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4f8cff"/>
+      <stop offset="1" stop-color="#38d39f"/>
+    </linearGradient>
+  </defs>
+  <rect width="192" height="192" rx="40" fill="url(#bg)"/>
+  <!-- signal arcs -->
+  <g fill="none" stroke="url(#accent)" stroke-width="9" stroke-linecap="round">
+    <path d="M52 120 A40 40 0 0 1 140 120"/>
+    <path d="M66 132 A26 26 0 0 1 126 132"/>
+  </g>
+  <!-- node -->
+  <circle cx="96" cy="138" r="11" fill="url(#accent)"/>
+  <!-- orbiting satellite -->
+  <g stroke="#4f8cff" stroke-width="6" fill="#e8edf7">
+    <circle cx="138" cy="58" r="7"/>
+  </g>
+  <ellipse cx="96" cy="78" rx="62" ry="26" fill="none" stroke="#4f8cff" stroke-width="4" opacity="0.6" transform="rotate(-25 96 78)"/>
+</svg>

@@ -8,3 +8,6 @@ requests>=2.31.0
 
 # Data visualization
 matplotlib>=3.8.2
+
+# Mobile API server (serves the REST API and installable PWA)
+flask>=3.0.0

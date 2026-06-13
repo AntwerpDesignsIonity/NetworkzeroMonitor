@@ -12,6 +12,7 @@ import unittest
 from unittest.mock import MagicMock, patch
 
 from network_monitor import NetworkMonitor, PiHoleMonitor
+from network_extended import ExtendedNetworkMonitor, _CELL_GENERATION
 
 
 class TestNetworkMonitorInfo(unittest.TestCase):
@@ -218,6 +219,64 @@ class TestPiHoleMonitor(unittest.TestCase):
         self.assertTrue(result['success'])
         self.assertTrue(result['enabled'])
         self.assertEqual(result['status'], 'enabled')
+
+
+class TestExtendedNetworkMonitor(unittest.TestCase):
+    """Tests for the extended network layers (cellular/wifi/satellite/GNSS)."""
+
+    def setUp(self):
+        self.ext = ExtendedNetworkMonitor()
+
+    def test_all_layers_structure(self):
+        layers = self.ext.get_all_layers()
+        for key in ('cellular', 'wifi', 'satellite_internet', 'gnss', 'timestamp'):
+            self.assertIn(key, layers)
+
+    def test_each_layer_has_available_flag(self):
+        layers = self.ext.get_all_layers()
+        for key in ('cellular', 'wifi', 'satellite_internet', 'gnss'):
+            self.assertIn('available', layers[key])
+            self.assertIsInstance(layers[key]['available'], bool)
+
+    def test_cellular_graceful_when_no_modem(self):
+        # No mmcli in test env -> graceful unavailable with a reason.
+        result = self.ext.get_cellular_info()
+        if not result['available']:
+            self.assertIn('reason', result)
+            self.assertEqual(result['modems'], [])
+
+    def test_gnss_constellation_mapping(self):
+        self.assertEqual(self.ext._gnss_constellation(0), 'GPS')
+        self.assertEqual(self.ext._gnss_constellation(2), 'Galileo')
+        self.assertEqual(self.ext._gnss_constellation(6), 'GLONASS')
+        self.assertEqual(self.ext._gnss_constellation(99), 'Unknown')
+
+    def test_cell_generation_mapping(self):
+        self.assertEqual(_CELL_GENERATION['lte'], '4G')
+        self.assertEqual(_CELL_GENERATION['5gnr'], '5G')
+        self.assertEqual(_CELL_GENERATION['umts'], '3G')
+        self.assertEqual(_CELL_GENERATION['gsm'], '2G')
+
+    def test_parse_modem_json(self):
+        raw = (
+            '{"modem": {"generic": {"operator-name": "TestNet", '
+            '"access-technologies": ["lte"], "state": "connected", '
+            '"signal-quality": {"value": "72", "recent": "yes"}, '
+            '"model": "TestModem"}}}'
+        )
+        modem = ExtendedNetworkMonitor._parse_modem_json(raw)
+        self.assertEqual(modem['operator'], 'TestNet')
+        self.assertEqual(modem['generation'], '4G')
+        self.assertEqual(modem['signal_percent'], 72)
+        self.assertTrue(modem['signal_recent'])
+
+    def test_parse_modem_json_invalid(self):
+        self.assertIsNone(ExtendedNetworkMonitor._parse_modem_json('not json'))
+
+    def test_satellite_reports_provider(self):
+        result = self.ext.get_satellite_internet()
+        self.assertEqual(result['provider'], 'Starlink')
+        self.assertIn('dish_reachable', result)
 
 
 def run_manual_demo():
